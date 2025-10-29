@@ -71,7 +71,13 @@ function SidebarProvider({
 
   // This is the internal state of the sidebar.
   // We use openProp and setOpenProp for control from outside the component.
-  const [_open, _setOpen] = React.useState(defaultOpen)
+
+
+// Définir la sidebar fermée par défaut sur desktop
+const [_open, _setOpen] = React.useState(() => {
+  return isMobile ? defaultOpen : false
+})
+
   const open = openProp ?? _open
   const setOpen = React.useCallback(
     (value: boolean | ((value: boolean) => boolean)) => {
