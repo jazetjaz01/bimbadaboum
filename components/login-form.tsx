@@ -15,6 +15,7 @@ import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { FcGoogle } from "react-icons/fc"; // Icône Google
 
 export function LoginForm({
   className,
@@ -38,13 +39,28 @@ export function LoginForm({
         password,
       });
       if (error) throw error;
-      // Update this route to redirect to an authenticated route. The user already has an active session.
-      router.push("/protected");
+      router.push("/");
+      
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : "An error occurred");
     } finally {
       setIsLoading(false);
     }
+  };
+
+  // 🔹 Connexion via Google
+  const handleGoogleLogin = async () => {
+    const supabase = createClient();
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`, // redirige vers ta page authentifiée
+      
+        
+      },
+      
+    });
+    if (error) setError(error.message);
   };
 
   return (
@@ -93,16 +109,32 @@ export function LoginForm({
                 {isLoading ? "Logging in..." : "Login"}
               </Button>
             </div>
-            <div className="mt-4 text-center text-sm">
-              Don&apos;t have an account?{" "}
-              <Link
-                href="/auth/sign-up"
-                className="underline underline-offset-4"
-              >
-                Sign up
-              </Link>
-            </div>
           </form>
+
+          {/* Séparateur */}
+          <div className="my-4 flex items-center justify-center">
+            <span className="text-sm text-muted-foreground">or</span>
+          </div>
+
+          {/* 🔹 Bouton Google */}
+          <Button
+            variant="outline"
+            className="w-full flex items-center justify-center gap-2"
+            onClick={handleGoogleLogin}
+          >
+            <FcGoogle size={20} />
+            Sign in with Google
+          </Button>
+
+          <div className="mt-4 text-center text-sm">
+            Don&apos;t have an account?{" "}
+            <Link
+              href="/auth/sign-up"
+              className="underline underline-offset-4"
+            >
+              Sign up
+            </Link>
+          </div>
         </CardContent>
       </Card>
     </div>

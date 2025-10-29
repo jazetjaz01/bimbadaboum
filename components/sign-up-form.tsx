@@ -15,6 +15,7 @@ import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { FcGoogle } from "react-icons/fc"; // Icône Google
 
 export function SignUpForm({
   className,
@@ -44,7 +45,7 @@ export function SignUpForm({
         email,
         password,
         options: {
-          emailRedirectTo: `${window.location.origin}/protected`,
+          emailRedirectTo: `${window.location.origin}/`,
         },
       });
       if (error) throw error;
@@ -53,6 +54,21 @@ export function SignUpForm({
       setError(error instanceof Error ? error.message : "An error occurred");
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  // 🔹 Fonction pour se connecter avec Google
+  const handleGoogleSignIn = async () => {
+    const supabase = createClient();
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: `${window.location.origin}/`, // ou la page de ton choix
+      },
+    });
+    if (error) {
+      console.error(error);
+      setError(error.message);
     }
   };
 
@@ -78,9 +94,7 @@ export function SignUpForm({
                 />
               </div>
               <div className="grid gap-2">
-                <div className="flex items-center">
-                  <Label htmlFor="password">Password</Label>
-                </div>
+                <Label htmlFor="password">Password</Label>
                 <Input
                   id="password"
                   type="password"
@@ -90,9 +104,7 @@ export function SignUpForm({
                 />
               </div>
               <div className="grid gap-2">
-                <div className="flex items-center">
-                  <Label htmlFor="repeat-password">Repeat Password</Label>
-                </div>
+                <Label htmlFor="repeat-password">Repeat Password</Label>
                 <Input
                   id="repeat-password"
                   type="password"
@@ -106,13 +118,29 @@ export function SignUpForm({
                 {isLoading ? "Creating an account..." : "Sign up"}
               </Button>
             </div>
-            <div className="mt-4 text-center text-sm">
-              Already have an account?{" "}
-              <Link href="/auth/login" className="underline underline-offset-4">
-                Login
-              </Link>
-            </div>
           </form>
+
+          {/* Divider */}
+          <div className="my-4 flex items-center justify-center">
+            <span className="text-sm text-muted-foreground">or</span>
+          </div>
+
+          {/* 🔹 Bouton Google */}
+          <Button
+            variant="outline"
+            className="w-full flex items-center justify-center gap-2"
+            onClick={handleGoogleSignIn}
+          >
+            <FcGoogle size={20} />
+            Sign up with Google
+          </Button>
+
+          <div className="mt-4 text-center text-sm">
+            Already have an account?{" "}
+            <Link href="/auth/login" className="underline underline-offset-4">
+              Login
+            </Link>
+          </div>
         </CardContent>
       </Card>
     </div>
